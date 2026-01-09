@@ -1,0 +1,11 @@
+-- basically what is needed to seed/start the app
+
+-- temporary - to be moved from orm-generated things for stability
+CREATE DATABASE videos TEMPLATE template0;
+
+\c videos
+
+CREATE TABLE videos (
+    id INTEGER PRIMARY KEY,
+    name VARCHAR(255)
+);
