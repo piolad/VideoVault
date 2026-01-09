@@ -1,6 +1,8 @@
 from flask import Blueprint, jsonify,request
+from pydantic import ValidationError
+from typing import Optional
 
-from .models import Video
+from .models import Video, VideoCreate, VideoOut
 from .db import db
 
 bp = Blueprint("main", __name__)
@@ -13,11 +15,17 @@ def hello():
 def ping():
     return jsonify(ok=True)
 
-
+# read
+@bp.get("/video")
 @bp.get("/videos")
-def list_video_ids():
-    videos = Video.query.order_by(Video.id.desc()).limit(50).all()
-    return jsonify(  [ {"id": v.id}    for v in videos ])
+@bp.get("/video/<id>")
+def read_video(id=None):
+    if id == None:
+        videos = Video.query.order_by(Video.id.desc()).limit(50).all()
+
+        return jsonify(  [ VideoOut.model_validate(v).model_dump()   for v in videos ])
+    v  = Video.query.get(id)
+    return jsonify({v})
 
 
 # create
@@ -28,21 +36,31 @@ def create_new_video(id=None):
 
     name = json_data.get('name')
     
-    if id is None:
-        id = json_data.get('id')
     if id is not None:
-        v  = Video.query.where(Video.id == id)
-        # if v not null - fail
-        pass 
+        json_data["id"] = id
 
     # Validation
+    try:
+        data = VideoCreate.model_validate(json_data)
+    except ValidationError as e:
+        return jsonify(ok=False, errors=e.errors()),400
+    
+    if id is not None:
+        v  = Video.query.get(id)
+        if v is not None:
+            return jsonify(ok=False,errors={"msg":"Film of that id already exists"}),400
 
-    v = Video(name=name)
+    v = Video(name=name, id=id)
     
     db.session.add(v)
     db.session.commit()
     
-    
-    print(f"id is : {id}")
 
-    return jsonify(ok=True)
+    return jsonify(ok=True), 201
+
+
+
+
+# update
+
+# delete
