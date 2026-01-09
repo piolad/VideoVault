@@ -1,1 +1,5 @@
 flask==3.1.2
+Flask-SQLAlchemy
+
+dotenv
+psycopg2
