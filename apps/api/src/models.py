@@ -11,6 +11,8 @@ class Video(db.Model):
     name: Mapped[str]
 
 class VideoCreate(BaseModel):
+    # to prevent injections
+    model_config = ConfigDict(extra="forbid") 
     name: str = Field(min_length=1)
     id: Optional[int] = None
 

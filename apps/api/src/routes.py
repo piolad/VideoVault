@@ -64,6 +64,20 @@ def create_new_video(id=None):
 
 
 # update
+@bp.patch("/video/<id>")
+def patch_video(id=None):
+    json_data = request.get_json(silent=True) or {}
+
+    if id is not None:
+        json_data["id"] = id
+
+    if id is None:
+        return jsonify(ok=False, reason="id is None"), 404
+
+    v = Video.query.get(id)
+
+    db.session
+    
 
 
 # delete
