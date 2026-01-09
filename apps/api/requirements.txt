@@ -1,7 +1,8 @@
 flask==3.1.2
 Flask-SQLAlchemy
 
-dotenv
+python-dotenv
+
 psycopg2
 
 pydantic
