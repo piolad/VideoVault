@@ -1,5 +1,6 @@
 from flask import Blueprint, jsonify,request
 from sqlalchemy import text
+from sqlalchemy.exc import SQLAlchemyError
 
 from .db import db
 
@@ -11,5 +12,10 @@ def live():
 
 @bp.get("/health/ready")
 def ready():
-    db.session.execute(text("SELECT 1"))
-    return jsonify(ok=True)
+    try:
+        db.session.execute(text("SELECT 1"))
+        return jsonify(ok=True)
+    
+    except SQLAlchemyError as e:
+        db.session.rollback()
+        return jsonify(ok=False, error=str(e)), 503

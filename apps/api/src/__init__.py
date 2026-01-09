@@ -1,7 +1,7 @@
 from flask import Flask
 from time import sleep
 from sqlalchemy import text
-from sqlalchemy.exc import OperationalError, SQLAlchemyError
+from sqlalchemy.exc import OperationalError
 
 from .db import db
 from .config import config
@@ -32,7 +32,7 @@ def wait_for_db(app, attempts=8, delay=2.0):
             return
         
         except OperationalError as e:
-            if i == attempts -1:
+            if i == attempts:
                 raise RuntimeError("Database connection failed after retries") from e
 
             app.logger.warning(

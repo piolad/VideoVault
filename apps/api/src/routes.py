@@ -1,7 +1,6 @@
 from flask import Blueprint, jsonify,request
 from pydantic import ValidationError
-from typing import Optional
-from sqlalchemy import delete
+from sqlalchemy import delete, update
 
 from .models import Video, VideoCreate, VideoOut
 from .db import db
@@ -19,24 +18,24 @@ def ping():
 # read
 @bp.get("/video")
 @bp.get("/videos")
-@bp.get("/video/<id>")
+@bp.get("/video/<int:id>")
 def read_video(id=None):
     if id == None:
         videos = Video.query.order_by(Video.id.desc()).limit(50).all()
         return jsonify(  [ VideoOut.model_validate(v).model_dump()   for v in videos ])
     
 
-    v  = Video.query.get(id)
+    v = Video.query.get(id)
+    if v is None:
+        return jsonify(ok=False, reason="not found"), 404
     return jsonify(VideoOut.model_validate(v).model_dump())
 
 
 # create
 @bp.post("/video")
-@bp.post("/video/<id>")
+@bp.post("/video/<int:id>")
 def create_new_video(id=None):
     json_data = request.get_json(silent=True) or {}
-
-    name = json_data.get('name')
     
     if id is not None:
         json_data["id"] = id
@@ -52,7 +51,7 @@ def create_new_video(id=None):
         if v is not None:
             return jsonify(ok=False,errors={"msg":"Film of that id already exists"}),400
 
-    v = Video(name=name, id=id)
+    v = Video(name=data.name, id=id)
     
     db.session.add(v)
     db.session.commit()
@@ -61,10 +60,8 @@ def create_new_video(id=None):
     return jsonify(ok=True), 201
 
 
-
-
 # update
-@bp.patch("/video/<id>")
+@bp.patch("/video/<int:id>")
 def patch_video(id=None):
     json_data = request.get_json(silent=True) or {}
 
@@ -74,14 +71,23 @@ def patch_video(id=None):
     if id is None:
         return jsonify(ok=False, reason="id is None"), 404
 
-    v = Video.query.get(id)
+    # to forbid injections
+    try:
+        data = VideoCreate.model_validate(json_data)
+    except ValidationError as e:
+        return jsonify(ok=False, errors=e.errors()),400
+    
+    stmt = update(Video).where(Video.id == id).values(data.model_dump())
 
-    db.session
+    result = db.session.execute(stmt)
+    db.session.commit()
+
+    return jsonify(ok=True)
+
     
 
-
 # delete
-@bp.delete("/video/<id>")
+@bp.delete("/video/<int:id>")
 def delete_video(id=None):
     if id is None:
         return jsonify(ok=False, reason="id is None"), 404
