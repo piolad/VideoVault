@@ -5,5 +5,5 @@ from .db import db
 
 class Video(db.Model):
     __tablename__ = "videos"
-    id: Mapped[int] = mapped_column(primary_key=True)
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
     name: Mapped[str]
