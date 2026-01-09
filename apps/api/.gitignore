@@ -1,4 +1,25 @@
+# env files
 .env
+.env.*
+!.env.example
 
+# python
 __pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# virtualenvs
 venv/
+.venv/
+env/
+
+# tooling
+dist/
+build/
+*.egg-info/
