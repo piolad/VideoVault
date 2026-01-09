@@ -22,10 +22,11 @@ def ping():
 def read_video(id=None):
     if id == None:
         videos = Video.query.order_by(Video.id.desc()).limit(50).all()
-
         return jsonify(  [ VideoOut.model_validate(v).model_dump()   for v in videos ])
+    
+
     v  = Video.query.get(id)
-    return jsonify({v})
+    return jsonify(VideoOut.model_validate(v).model_dump())
 
 
 # create
