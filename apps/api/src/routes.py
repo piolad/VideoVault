@@ -1,6 +1,7 @@
 from flask import Blueprint, jsonify,request
 from pydantic import ValidationError
 from typing import Optional
+from sqlalchemy import delete
 
 from .models import Video, VideoCreate, VideoOut
 from .db import db
@@ -64,4 +65,21 @@ def create_new_video(id=None):
 
 # update
 
+
 # delete
+@bp.delete("/video/<id>")
+def delete_video(id=None):
+    if id is None:
+        return jsonify(ok=False, reason="id is None"), 404
+
+    stmt = delete(Video).where(Video.id == id)
+    
+    result = db.session.execute(stmt)
+    db.session.commit()
+    
+    if result.rowcount == 0:
+        return jsonify(ok=False, reason="not found"), 404
+    
+    return jsonify(ok=True)
+
+
