@@ -25,7 +25,7 @@ def read_video(id=None):
         return jsonify(  [ VideoOut.model_validate(v).model_dump()   for v in videos ])
     
 
-    v = Video.query.get(id)
+    v = db.session.get(Video, id)
     if v is None:
         return jsonify(ok=False, reason="not found"), 404
     return jsonify(VideoOut.model_validate(v).model_dump())
@@ -47,7 +47,7 @@ def create_new_video(id=None):
         return jsonify(ok=False, errors=e.errors()),400
     
     if id is not None:
-        v  = Video.query.get(id)
+        v  = db.session.get(Video, id)
         if v is not None:
             return jsonify(ok=False,errors={"msg":"Film of that id already exists"}),400
 
