@@ -8,7 +8,7 @@ from .db import db
 class Video(db.Model):
     __tablename__ = "videos"
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    name: Mapped[str]
+    name: Mapped[str]= mapped_column(String(255), nullable=False, index=True)
 
 class VideoCreate(BaseModel):
     # to prevent injections
