@@ -4,6 +4,7 @@ from sqlalchemy.orm import Mapped, mapped_column
 from pydantic import BaseModel, Field,ConfigDict
 from typing import Optional
 from enum import Enum
+from datetime import datetime
 
 from .db import db
 
@@ -26,15 +27,15 @@ class Video(db.Model):
 
     owner_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False, index=True)
 
-    title: Mapped[str] = mapped_column(String(255), nullable=False) # todo: add fuzzy index for searching
+    title: Mapped[str] = mapped_column(String(255), nullable=False) # TODO: add fuzzy index for searching
 
     description: Mapped[str] = mapped_column(Text, nullable=False)
 
     visibility: Mapped[VideoVisibility]  = mapped_column( SqlAlchEnum(VideoVisibility, name="video_visibility", native_enum=True, validateStrings=True) )
 
-    status: Mapped[VideoStatus]  = mapped_column( SqlAlchEnum(VideoStatus, name="video_status", native_enum=True, validateStrings=True) )
+    status: Mapped[VideoStatus]  = mapped_column( SqlAlchEnum(VideoStatus, name="video_status", native_enum=True, validateStrings=True), default=VideoStatus.UPLOADING )
 
-    blob_key: Mapped[str] = mapped_column(String(1024, nullable=False))
+    blob_key: Mapped[str] = mapped_column(String(1024), nullable=False)
 
     hls_master_key: Mapped[Optional[str]] = mapped_column(String(1024), nullable=True)
 
@@ -45,8 +46,8 @@ class Video(db.Model):
     uploaded_at: Mapped[Optional["datetime"]] = mapped_column(DateTime(timezone=True),nullable=True)
     deleted_at: Mapped[Optional["datetime"]] = mapped_column(DateTime(timezone=True),nullable=True)
     
-    # version: Mapped[int] # todo, for concurrency
-    # like_count: Mapped[int] # caching, todo
+    # version: Mapped[int] # TODO, for concurrency
+    # like_count: Mapped[int] # caching, TODO,
 
 
 
@@ -81,3 +82,5 @@ class VideoOut(BaseModel):
     uploaded_at: Optional[datetime]
     deleted_at: Optional[datetime]
 
+
+# TODO: videoUpdate

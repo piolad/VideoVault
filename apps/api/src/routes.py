@@ -16,9 +16,7 @@ def ping():
     return jsonify(ok=True)
 
 # read
-@bp.get("/video")
-@bp.get("/videos")
-@bp.get("/video/<int:id>")
+@bp.get("/videos/<int:id>")
 def read_video(id=None):
     if id == None:
         videos = Video.query.order_by(Video.id.desc()).limit(50).all()
@@ -32,29 +30,24 @@ def read_video(id=None):
 
 
 # create
+# TODO: Add validation with ACLs
 @bp.post("/video")
-@bp.post("/video/<int:id>")
 def create_new_video(id=None):
     json_data = request.get_json(silent=True) or {}
     
-    if id is not None:
-        json_data["id"] = id
-
     # Validation
     try:
         data = VideoCreate.model_validate(json_data)
     except ValidationError as e:
         return jsonify(ok=False, errors=e.errors()),400
     
-    if id is not None:
-        v  = db.session.get(Video, id)
-        if v is not None:
-            return jsonify(ok=False,errors={"msg":"Film of that id already exists"}),400
-
-    v = Video(name=data.name, id=id)
+    #TODO: validate: max vid length & size, other rules
     
-    db.session.add(v)
-    db.session.commit()
+    #TODO: get the MinIO id for this movie
+
+    #TODO: return the MinIO id for the client
+    
+    db.session.add()
     
 
     return jsonify(ok=True), 201
