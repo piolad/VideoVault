@@ -45,19 +45,39 @@ class Video(db.Model):
     uploaded_at: Mapped[Optional["datetime"]] = mapped_column(DateTime(timezone=True),nullable=True)
     deleted_at: Mapped[Optional["datetime"]] = mapped_column(DateTime(timezone=True),nullable=True)
     
-    #version: Mapped[int] # todo, for concurrency
+    # version: Mapped[int] # todo, for concurrency
     # like_count: Mapped[int] # caching, todo
 
 
 
 # for pydantic
 class VideoCreate(BaseModel):
-    # to prevent injections
-    model_config = ConfigDict(extra="forbid") 
-    name: str = Field(min_length=1)
+    # to prevent some injections
+    model_config = ConfigDict(extra="forbid")
+
     id: Optional[int] = None
+    title: str = Field(min_length=1, max_length=255)
+    
+    description: str = Field(default="", max_length=50_000)
+
+    visibility: VideoVisibility = VideoVisibility.PRIVATE
 
 class VideoOut(BaseModel):
     model_config = ConfigDict(from_attributes=True)
+
     id: int
-    name: str
+    owner_id: int
+    title: str
+    description: str
+    visibility: VideoVisibility
+    status: VideoStatus
+    
+    blob_key: str
+    hls_master_key: Optional[str]
+    
+    duration_seconds: int
+
+    created_at: datetime
+    uploaded_at: Optional[datetime]
+    deleted_at: Optional[datetime]
+
