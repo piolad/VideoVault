@@ -2,14 +2,23 @@ from flask import Flask
 from time import sleep
 from sqlalchemy import text
 from sqlalchemy.exc import OperationalError
+import logging
 
 from .db import db
 from .config import config
 from .routes import bp as main_bp
 from .hc import bp as healthchecks_bp
 
+
 def create_app():
     app = Flask(__name__)
+
+    gunicorn_logger = logging.getLogger("gunicorn.error")
+    if gunicorn_logger.handlers:
+        app.logger.handlers = gunicorn_logger.handlers
+        app.logger.setLevel(gunicorn_logger.level)
+        app.logger.propagate = False
+
 
     app.config["SQLALCHEMY_DATABASE_URI"] = config["database_url"]
 
