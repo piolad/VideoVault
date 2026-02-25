@@ -46,6 +46,10 @@ def create_new_video(id=None):
     #TODO: get the MinIO id for this movie
 
     #TODO: return the MinIO id for the client
+
+
+    # Flow plan: 1. validate if calling user has the rights (with JWT)
+    # if user can do this, provide them with the private url to upload image to
     
     db.session.add()
     
