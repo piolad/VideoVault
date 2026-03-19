@@ -1,6 +1,6 @@
 from sqlalchemy import Integer, String, ForeignKey, Text, DateTime
 from sqlalchemy import Enum as SqlAlchEnum
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 from pydantic import BaseModel, Field,ConfigDict
 from typing import Optional
 from enum import Enum
@@ -29,6 +29,8 @@ class User(db.Model):
     deleted_at: Mapped[Optional["datetime"]] = mapped_column(DateTime(timezone=True),nullable=True)
 
     status: Mapped[AccountStatus] = mapped_column( SqlAlchEnum(AccountStatus, name="account_status", native_enum=True, validateStrings=True), default=AccountStatus.INACTIVE )
+    
+    videos: Mapped[list["Video"]] = relationship(back_populates="owner")
 
 
 

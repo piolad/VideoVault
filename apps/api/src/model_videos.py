@@ -1,6 +1,6 @@
 from sqlalchemy import Integer, String, ForeignKey, Text, DateTime
 from sqlalchemy import Enum as SqlAlchEnum
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 from pydantic import BaseModel, Field,ConfigDict
 from typing import Optional
 from enum import Enum
@@ -26,6 +26,7 @@ class Video(db.Model):
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
 
     owner_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False, index=True)
+    owner: Mapped["User"] = relationship(back_populates="videos")
 
     title: Mapped[str] = mapped_column(String(255), nullable=False) # TODO: add fuzzy index for searching
 
