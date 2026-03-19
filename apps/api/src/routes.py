@@ -2,7 +2,7 @@ from flask import Blueprint, jsonify,request
 from pydantic import ValidationError
 from sqlalchemy import delete, update
 
-from .models import Video, VideoCreate, VideoOut
+from .model_videos import Video, VideoCreate, VideoOut
 from .db import db
 
 bp = Blueprint("main", __name__)
